@@ -51,12 +51,13 @@ jobs:
         run: |
           new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}")
           echo "Created a new issue: $new_issue"
-          echo "ISSUE_NUMBER=$(echo $new_issue | jq -r .number)" >> $GITHUB_ENV
+          echo "ISSUE_URL=$(echo $new_issue | jq -r .html_url)" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       - name: Comment on PR with issue link
         if: env.ISSUE_EXISTS == 'false'
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "Created a new issue: #${{ env.ISSUE_NUMBER }}" --repo "${{ env.ORG }}/${{ env.REPO }}"
+          echo "${{ env.ISSUE_URL }}"
+          gh pr comment ${{ github.event.pull_request.number }} --body "Created a new issue to track the PR: #${{ env.ISSUE_URL }}" --repo "${{ env.ORG }}/${{ env.REPO }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  

@@ -22,7 +22,7 @@ jobs:
           echo "ORG=TestCIKek" >> $GITHUB_ENV
           echo "REPO=test-ci-repo" >> $GITHUB_ENV
           echo "TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
-          echo "BODY=${{ github.event.pull_request.body }}" >> $GITHUB_ENV
+          echo "BODY='${{ github.event.pull_request.body }}'" >> $GITHUB_ENV
       - name: Check user membership
         run: |
           if gh api "orgs/${{ env.ORG }}/public_members/${{ env.USER }}" --silent; then

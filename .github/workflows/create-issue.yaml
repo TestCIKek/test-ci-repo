@@ -33,7 +33,7 @@ jobs:
           fi
       - name: Check issue
         run: |
-          issue_links=$(echo "${{ github.event.pull_request.body }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+')
+          issue_links=$(echo "${{ github.event.pull_request.body }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+' || true)
           
           if [ -z "$issue_links" ]; then
             echo "No linked issue found."

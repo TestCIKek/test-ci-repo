@@ -22,7 +22,6 @@ jobs:
           echo "ORG=TestCIKek" >> $GITHUB_ENV
           echo "REPO=test-ci-repo" >> $GITHUB_ENV
           echo "TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
-          echo "BODY='${{ github.event.pull_request.body }}'" >> $GITHUB_ENV
       - name: Check user membership
         run: |
           if gh api "orgs/${{ env.ORG }}/public_members/${{ env.USER }}" --silent; then
@@ -34,7 +33,7 @@ jobs:
           fi
       - name: Check issue
         run: |
-          issue_links=$(echo "${{ env.BODY }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+')
+          issue_links=$(echo "${{ github.event.pull_request.body }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+')
           
           if [ -z "$issue_links" ]; then
             echo "No linked issue found."
@@ -47,7 +46,7 @@ jobs:
       - name: Create an issue
         if: env.ISSUE_EXISTS == 'false'
         run: |
-          new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ env.BODY }}" --repo "${{ env.ORG }}/${{ env.REPO }}" --json number)
+          new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}" --json number)
           echo "Created a new issue: $new_issue"
           echo "ISSUE_NUMBER=$(echo $new_issue | jq -r .number)" >> $GITHUB_ENV
       - name: Comment on PR with issue link

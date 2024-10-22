@@ -46,7 +46,7 @@ jobs:
       - name: Create an issue
         if: env.ISSUE_EXISTS == 'false'
         run: |
-          new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}" --json number)
+          new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}")
           echo "Created a new issue: $new_issue"
           echo "ISSUE_NUMBER=$(echo $new_issue | jq -r .number)" >> $GITHUB_ENV
       - name: Comment on PR with issue link

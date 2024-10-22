@@ -34,6 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       - name: Check issue
+        if: env.MEMBER == 'false'
         run: |
           issue_links=$(echo "${{ github.event.pull_request.body }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+' || true)
           
@@ -48,7 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       - name: Create an issue
-        if: env.ISSUE_EXISTS == 'false'
+        if: (env.MEMBER == 'false') && (env.ISSUE_EXISTS == 'false')
         run: |
           new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}" 2>&1)
           echo "Created a new issue: $new_issue"
@@ -56,9 +57,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       - name: Comment on PR with issue link
-        if: env.ISSUE_EXISTS == 'false'
+        if: (env.MEMBER == 'false') && (env.ISSUE_EXISTS == 'false')
         run: |
           echo "${{ env.ISSUE_URL }}"
-          gh pr comment ${{ github.event.pull_request.number }} --body "Created a new issue to track the PR: #${{ env.ISSUE_URL }}" --repo "${{ env.ORG }}/${{ env.REPO }}"
+          gh pr comment ${{ github.event.pull_request.number }} --body "Created a new issue to track the PR: ${{ env.ISSUE_URL }}" --repo "${{ env.ORG }}/${{ env.REPO }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  

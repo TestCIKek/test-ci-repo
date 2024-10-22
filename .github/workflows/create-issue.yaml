@@ -18,7 +18,6 @@ jobs:
       - name: Setup env
         run: |
           echo "USER=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
-          echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           echo "ORG=TestCIKek" >> $GITHUB_ENV
           echo "REPO=test-ci-repo" >> $GITHUB_ENV
           echo "TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
@@ -31,6 +30,8 @@ jobs:
             echo "${{ env.USER }} is not a public member of ${{ env.ORG }}"
             echo "MEMBER=false" >> $GITHUB_ENV 
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       - name: Check issue
         run: |
           issue_links=$(echo "${{ github.event.pull_request.body }}" | grep -o 'https://github.com/${{ env.ORG }}/${{ env.REPO }}/issues/[0-9]\+' || true)
@@ -43,13 +44,19 @@ jobs:
             echo "ISSUE_EXISTS=true" >> $GITHUB_ENV
             echo "ISSUE_LINK=$issue_links" >> $GITHUB_ENV
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       - name: Create an issue
         if: env.ISSUE_EXISTS == 'false'
         run: |
           new_issue=$(gh issue create --title "${{ env.TITLE }}" --body "${{ github.event.pull_request.body }}" --repo "${{ env.ORG }}/${{ env.REPO }}")
           echo "Created a new issue: $new_issue"
           echo "ISSUE_NUMBER=$(echo $new_issue | jq -r .number)" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       - name: Comment on PR with issue link
         if: env.ISSUE_EXISTS == 'false'
         run: |
           gh pr comment ${{ github.event.pull_request.number }} --body "Created a new issue: #${{ env.ISSUE_NUMBER }}" --repo "${{ env.ORG }}/${{ env.REPO }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
